@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevOrbit – AI-Powered Workflow OS for Developers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    :root {
+      --bg: #050508;
+      --bg-elevated: #0c0c12;
+      --fg: #f0f0f5;
+      --muted: #6b6b80;
+      --accent: #00e5ff;
+      --accent-secondary: #7c3aed;
+      --card: rgba(20, 20, 35, 0.6);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --glass: rgba(255, 255, 255, 0.03);
+      --glow: rgba(0, 229, 255, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    /* Background Effects */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .gradient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
+      top: -200px;
+      right: -100px;
+      animation: float-1 20s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      bottom: 20%;
+      left: -150px;
+      animation: float-2 25s ease-in-out infinite;
+    }
+
+    .orb-3 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #f472b6 0%, transparent 70%);
+      top: 50%;
+      right: 10%;
+      animation: float-3 18s ease-in-out infinite;
+    }
+
+    @keyframes float-1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-50px, 50px) scale(1.1); }
+    }
+
+    @keyframes float-2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -40px) scale(1.05); }
+    }
+
+    @keyframes float-3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-20px, 30px) scale(0.95); }
+    }
+
+    /* Glassmorphism Card */
+    .glass-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(0, 229, 255, 0.2);
+      box-shadow: 0 0 40px var(--glow);
+      transform: translateY(-4px);
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 24px;
+      background: rgba(5, 5, 8, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--card-border);
+      transition: all 0.3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(5, 5, 8, 0.95);
+    }
+
+    .nav-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--fg);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    /* Section Styling */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 100px 24px;
+    }
+
+    .section-title {
+      font-size: clamp(32px, 5vw, 48px);
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 18px);
+      max-width: 600px;
+    }
+
+    /* Reveal Animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+
+    /* Hero Specific */
+    .hero-title {
+      font-size: clamp(40px, 8vw, 80px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Floating Elements */
+    .floating-icon {
+      animation: float-icon 6s ease-in-out infinite;
+    }
+
+    .floating-icon:nth-child(2) { animation-delay: -2s; }
+    .floating-icon:nth-child(3) { animation-delay: -4s; }
+
+    @keyframes float-icon {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    /* Feature Icon Container */
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover .feature-icon {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+      box-shadow: 0 0 20px var(--glow);
+    }
+
+    /* Tech Badge */
+    .tech-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+
+    .tech-badge:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 229, 255, 0.05);
+    }
+
+    /* Timeline */
+    .timeline-item {
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 20px var(--accent);
+    }
+
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 24px;
+      width: 2px;
+      height: calc(100% - 8px);
+      background: linear-gradient(180deg, var(--accent), transparent);
+    }
+
+    .timeline-item:last-child::after {
+      display: none;
+    }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 5, 8, 0.98);
+      z-index: 99;
+      padding: 100px 24px 24px;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      font-size: 24px;
+      color: var(--fg);
+      text-decoration: none;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    /* Pulse Animation */
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Orbit Animation */
+    .orbit-container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 50%;
+      animation: orbit-rotate 30s linear infinite;
+    }
+
+    .orbit-ring:nth-child(1) { inset: 10%; animation-duration: 25s; }
+    .orbit-ring:nth-child(2) { inset: 25%; animation-duration: 35s; animation-direction: reverse; }
+    .orbit-ring:nth-child(3) { inset: 40%; animation-duration: 20s; }
+
+    @keyframes orbit-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .orbit-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 20px var(--accent);
+      top: 50%;
+      left: 0;
+      transform: translate(-50%, -50%);
+    }
+
+    .orbit-center {
+      position: absolute;
+      inset: 35%;
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 60px rgba(124, 58, 237, 0.5);
+    }
+
+    /* Comparison Card */
+    .comparison-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--glass);
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .check-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(0, 229, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 60px 24px 30px;
+      border-top: 1px solid var(--card-border);
+      background: var(--bg-elevated);
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Effects -->
+  <div class="bg-grid"></div>
+  <div class="gradient-orb orb-1"></div>
+  <div class="gradient-orb orb-2"></div>
+  <div class="gradient-orb orb-3"></div>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3" aria-label="DevOrbit Home">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center">
+          <i data-lucide="orbit" class="w-5 h-5 text-white"></i>
+        </div>
+        <span class="font-bold text-xl tracking-tight" style="font-family: 'Space Grotesk', sans-serif;">DevOrbit</span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#problem" class="nav-link">Problem</a>
+        <a href="#solution" class="nav-link">Solution</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#roadmap" class="nav-link">Roadmap</a>
+      </div>
+
+      <div class="hidden md:block">
+        <!-- Spacer for layout balance -->
+      </div>
+
+      <button id="menu-toggle" class="md:hidden p-2" aria-label="Toggle menu" aria-expanded="false">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
+    <a href="#problem">Problem</a>
+    <a href="#solution">Solution</a>
+    <a href="#features">Features</a>
+    <a href="#roadmap">Roadmap</a>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="min-h-screen flex items-center pt-20">
+    <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+      <div class="reveal">
+        <div class="flex items-center gap-2 mb-6">
+          <div class="pulse-dot"></div>
+          <span class="text-sm text-cyan-400 font-medium">Now in Early Access</span>
+        </div>
+        
+        <h1 class="hero-title mb-6">
+          <span class="gradient-text">DevOrbit</span><br>
+          AI-Powered Workflow OS for Developers
+        </h1>
+        
+        <p class="text-xl text-gray-400 mb-8 max-w-lg">
+          Plan faster. Execute smarter. Build better. The unified platform that transforms how dev teams ship products.
+        </p>
+
+        <div class="flex items-center gap-6 mt-10 pt-8 border-t border-white/5">
+          <div>
+            <div class="text-2xl font-bold">2,400+</div>
+            <div class="text-sm text-gray-500">Teams onboarded</div>
+          </div>
+          <div class="w-px h-10 bg-white/10"></div>
+          <div>
+            <div class="text-2xl font-bold">98%</div>
+            <div class="text-sm text-gray-500">Satisfaction rate</div>
+          </div>
+          <div class="w-px h-10 bg-white/10"></div>
+          <div>
+            <div class="text-2xl font-bold">3x</div>
+            <div class="text-sm text-gray-500">Faster delivery</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-2 flex justify-center">
+        <div class="orbit-container">
+          <div class="orbit-ring">
+            <div class="orbit-dot"></div>
+          </div>
+          <div class="orbit-ring">
+            <div class="orbit-dot" style="background: #a78bfa; box-shadow: 0 0 20px #a78bfa;"></div>
+          </div>
+          <div class="orbit-ring">
+            <div class="orbit-dot" style="background: #f472b6; box-shadow: 0 0 20px #f472b6;"></div>
+          </div>
+          <div class="orbit-center">
+            <i data-lucide="brain" class="w-12 h-12 text-white"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section id="problem" class="relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="text-cyan-400 text-sm font-medium tracking-wider uppercase">The Problem</span>
+        <h2 class="section-title mt-4">Developers Are Drowning in Disconnected Tools</h2>
+        <p class="section-subtitle mx-auto">The modern dev workflow is fragmented across too many platforms, leading to chaos and lost productivity.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+        <div class="glass-card p-6 text-center reveal reveal-delay-1 floating-icon">
+          <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-green-500/10 flex items-center justify-center">
+            <i data-lucide="message-circle" class="w-6 h-6 text-green-400"></i>
+          </div>
+          <div class="font-medium">WhatsApp</div>
+          <div class="text-xs text-gray-500 mt-1">Team chatter</div>
+        </div>
+        <div class="glass-card p-6 text-center reveal reveal-delay-2 floating-icon">
+          <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-blue-500/10 flex items-center justify-center">
+            <i data-lucide="clipboard-list" class="w-6 h-6 text-blue-400"></i>
+          </div>
+          <div class="font-medium">Forms & Sheets</div>
+          <div class="text-xs text-gray-500 mt-1">Data chaos</div>
+        </div>
+        <div class="glass-card p-6 text-center reveal reveal-delay-3 floating-icon">
+          <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-violet-500/10 flex items-center justify-center">
+            <i data-lucide="trello" class="w-6 h-6 text-violet-400"></i>
+          </div>
+          <div class="font-medium">Trello/Notion</div>
+          <div class="text-xs text-gray-500 mt-1">Task tracking</div>
+        </div>
+        <div class="glass-card p-6 text-center reveal reveal-delay-4 floating-icon">
+          <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-orange-500/10 flex items-center justify-center">
+            <i data-lucide="github" class="w-6 h-6 text-orange-400"></i>
+          </div>
+          <div class="font-medium">GitHub</div>
+          <div class="text-xs text-gray-500 mt-1">Code repos</div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="glass-card p-8 reveal reveal-delay-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+              <i data-lucide="unlink" class="w-5 h-5 text-red-400"></i>
+            </div>
+            <h3 class="font-semibold">Poor Coordination</h3>
+          </div>
+          <p class="text-gray-400 text-sm">Information scattered across platforms makes it impossible to maintain a single source of truth.</p>
+        </div>
+        <div class="glass-card p-8 reveal reveal-delay-2">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+              <i data-lucide="clock" class="w-5 h-5 text-yellow-400"></i>
+            </div>
+            <h3 class="font-semibold">Missed Deadlines</h3>
+          </div>
+          <p class="text-gray-400 text-sm">Without proper tracking and automation, teams consistently miss critical milestones.</p>
+        </div>
+        <div class="glass-card p-8 reveal reveal-delay-3">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+              <i data-lucide="trending-down" class="w-5 h-5 text-orange-400"></i>
+            </div>
+            <h3 class="font-semibold">Low Productivity</h3>
+          </div>
+          <p class="text-gray-400 text-sm">Hours wasted context-switching between tools instead of building products.</p>
+        </div>
+      </div>
+
+      <div class="mt-16 text-center reveal">
+        <p class="text-gray-400 mb-6">Affected teams include:</p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <span class="tech-badge">Hackathon Teams</span>
+          <span class="tech-badge">Student Developers</span>
+          <span class="tech-badge">Tech Clubs</span>
+          <span class="tech-badge">Early-stage Startups</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution Section -->
+  <section id="solution" class="relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="reveal">
+          <span class="text-cyan-400 text-sm font-medium tracking-wider uppercase">The Solution</span>
+          <h2 class="section-title mt-4">DevOrbit: Your AI-Powered Command Center</h2>
+          <p class="text-gray-400 mb-8">One unified platform that combines planning, execution, and tracking with intelligent automation built specifically for developer workflows.</p>
+
+          <div class="space-y-4">
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-white/2 border border-white/5 hover:border-cyan-500/30 transition-all cursor-pointer group">
+              <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-cyan-500/20 transition-colors">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 text-cyan-400"></i>
+              </div>
+              <div>
+                <h4 class="font-medium mb-1">Project Planning</h4>
+                <p class="text-sm text-gray-500">AI-powered project scaffolding and milestone generation</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-white/2 border border-white/5 hover:border-violet-500/30 transition-all cursor-pointer group">
+              <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-violet-500/20 transition-colors">
+                <i data-lucide="list-checks" class="w-5 h-5 text-violet-400"></i>
+              </div>
+              <div>
+                <h4 class="font-medium mb-1">Task Management</h4>
+                <p class="text-sm text-gray-500">Smart task breakdown with automatic assignment suggestions</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-white/2 border border-white/5 hover:border-pink-500/30 transition-all cursor-pointer group">
+              <div class="w-10 h-10 rounded-lg bg-pink-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-pink-500/20 transition-colors">
+                <i data-lucide="users" class="w-5 h-5 text-pink-400"></i>
+              </div>
+              <div>
+                <h4 class="font-medium mb-1">Team Coordination</h4>
+                <p class="text-sm text-gray-500">Real-time collaboration with role-based insights</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <div class="glass-card p-8">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center">
+                <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+              </div>
+              <span class="font-semibold">AI Features</span>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-white/2">
+                <i data-lucide="wand-2" class="w-5 h-5 text-cyan-400"></i>
+                <span class="text-sm">Auto task breakdown from project goals</span>
+              </div>
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-white/2">
+                <i data-lucide="flag" class="w-5 h-5 text-violet-400"></i>
+                <span class="text-sm">Smart milestone generation</span>
+              </div>
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-white/2">
+                <i data-lucide="user-plus" class="w-5 h-5 text-pink-400"></i>
+                <span class="text-sm">Intelligent role suggestions</span>
+              </div>
+              <div class="flex items-center gap-3 p-3 rounded-lg bg-white/2">
+                <i data-lucide="zap" class="w-5 h-5 text-yellow-400"></i>
+                <span class="text-sm">Execution automation, not just task lists</span>
+              </div>
+            </div>
+
+            <div class="mt-6 p-4 rounded-lg bg-gradient-to-r from-cyan-500/10 to-violet-500/10 border border-cyan-500/20">
+              <p class="text-sm text-gray-300">Built specifically for dev teams and hackathons. We focus on execution automation, not just planning.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features / Target Users Section -->
+  <section id="features" class="relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="text-cyan-400 text-sm font-medium tracking-wider uppercase">Who Is This For</span>
+        <h2 class="section-title mt-4">Built for Teams That Ship</h2>
+        <p class="section-subtitle mx-auto">From hackathon squads to startup teams, DevOrbit adapts to your workflow.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div class="glass-card p-6 reveal reveal-delay-1">
+          <div class="feature-icon mb-4">
+            <i data-lucide="trophy" class="w-6 h-6 text-cyan-400"></i>
+          </div>
+          <h3 class="font-semibold mb-2">Hackathon Teams</h3>
+          <p class="text-sm text-gray-500">Ship winning prototypes in 24-48 hours with AI-powered planning.</p>
+        </div>
+        <div class="glass-card p-6 reveal reveal-delay-2">
+          <div class="feature-icon mb-4">
+            <i data-lucide="graduation-cap" class="w-6 h-6 text-violet-400"></i>
+          </div>
+          <h3 class="font-semibold mb-2">College Tech Clubs</h3>
+          <p class="text-sm text-gray-500">Coordinate multiple projects and members effortlessly.</p>
+        </div>
+        <div class="glass-card p-6 reveal reveal-delay-3">
+          <div class="feature-icon mb-4">
+            <i data-lucide="book-open" class="w-6 h-6 text-pink-400"></i>
+          </div>
+          <h3 class="font-semibold mb-2">Student Projects</h3>
+          <p class="text-sm text-gray-500">Stay organized and meet academic deadlines with ease.</p>
+        </div>
+        <div class="glass-card p-6 reveal reveal-delay-4">
+          <div class="feature-icon mb-4">
+            <i data-lucide="rocket" class="w-6 h-6 text-yellow-400"></i>
+          </div>
+          <h3 class="font-semibold mb-2">Startup Teams</h3>
+          <p class="text-sm text-gray-500">Move fast from MVP to launch with streamlined workflows.</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-8 reveal">
+        <h3 class="text-xl font-semibold mb-6 text-center">The Impact</h3>
+        <div class="grid md:grid-cols-4 gap-6">
+          <div class="text-center p-4">
+            <div class="text-3xl font-bold text-cyan-400 mb-2">3x</div>
+            <div class="text-sm text-gray-400">Faster Execution</div>
+            <div class="mt-3 text-xs text-gray-500">Ship products in days, not weeks</div>
+          </div>
+          <div class="text-center p-4">
+            <div class="text-3xl font-bold text-violet-400 mb-2">85%</div>
+            <div class="text-sm text-gray-400">Better Collaboration</div>
+            <div class="mt-3 text-xs text-gray-500">Teams stay aligned automatically</div>
+          </div>
+          <div class="text-center p-4">
+            <div class="text-3xl font-bold text-pink-400 mb-2">100%</div>
+            <div class="text-sm text-gray-400">Progress Visibility</div>
+            <div class="mt-3 text-xs text-gray-500">Never lose track of milestones</div>
+          </div>
+          <div class="text-center p-4">
+            <div class="text-3xl font-bold text-yellow-400 mb-2">-60%</div>
+            <div class="text-sm text-gray-400">Planning Overhead</div>
+            <div class="mt-3 text-xs text-gray-500">AI handles the busywork</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feasibility Section -->
+  <section class="relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-16">
+        <div class="reveal">
+          <span class="text-cyan-400 text-sm font-medium tracking-wider uppercase">How We Build</span>
+          <h2 class="section-title mt-4">24-Hour MVP Plan</h2>
+          <p class="text-gray-400 mb-8">A focused approach to delivering core value fast.</p>
+
+          <div class="space-y-6">
+            <div class="timeline-item pb-6">
+              <div class="font-semibold mb-1">Project & Team Creation</div>
+              <p class="text-sm text-gray-500">Quick onboarding with intuitive project setup</p>
+            </div>
+            <div class="timeline-item pb-6">
+              <div class="font-semibold mb-1">AI Task Generator</div>
+              <p class="text-sm text-gray-500">Intelligent breakdown of project goals into actionable tasks</p>
+            </div>
+            <div class="timeline-item pb-6">
+              <div class="font-semibold mb-1">Simple Kanban Board</div>
+              <p class="text-sm text-gray-500">Drag-and-drop task management with status tracking</p>
+            </div>
+            <div class="timeline-item">
+              <div class="font-semibold mb-1">Progress Dashboard</div>
+              <p class="text-sm text-gray-500">Real-time visibility into team progress and blockers</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <div class="glass-card p-8 h-full">
+            <h3 class="font-semibold mb-6 flex items-center gap-2">
+              <i data-lucide="layers" class="w-5 h-5 text-cyan-400"></i>
+              Tech Stack
+            </h3>
+
+            <div class="space-y-6">
+              <div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">Frontend</div>
+                <div class="flex flex-wrap gap-2">
+                  <span class="tech-badge">
+                    <i data-lucide="atom" class="w-4 h-4"></i>
+                    React
+                  </span>
+                  <span class="tech-badge">
+                    <i data-lucide="triangle" class="w-4 h-4"></i>
+                    Next.js
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">Backend</div>
+                <div class="flex flex-wrap gap-2">
+                  <span class="tech-badge">
+                    <i data-lucide="server" class="w-4 h-4"></i>
+                    Node.js
+                  </span>
+                  <span class="tech-badge">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
+                    FastAPI
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">Database</div>
+                <div class="flex flex-wrap gap-2">
+                  <span class="tech-badge">
+                    <i data-lucide="flame" class="w-4 h-4"></i>
+                    Firebase
+                  </span>
+                  <span class="tech-badge">
+                    <i data-lucide="database" class="w-4 h-4"></i>
+                    MongoDB
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">AI Layer</div>
+                <div class="flex flex-wrap gap-2">
+                  <span class="tech-badge">
+                    <i data-lucide="brain" class="w-4 h-4"></i>
+                    LLM API
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 p-4 rounded-lg bg-gradient-to-r from-cyan-500/5 to-violet-500/5 border border-white/5">
+              <div class="flex items-center gap-2 text-sm text-gray-400">
+                <i data-lucide="info" class="w-4 h-4"></i>
+                <span>Optimized for rapid iteration and deployment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Competitive Advantage Section -->
+  <section class="relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="text-cyan-400 text-sm font-medium tracking-wider uppercase">Why DevOrbit</span>
+        <h2 class="section-title mt-4">Not Just Another Task Manager</h2>
+        <p class="section-subtitle mx-auto">We're building an AI execution engine, not another to-do list.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div class="glass-card p-8 reveal reveal-delay-1">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
+              <i data-lucide="x" class="w-6 h-6 text-red-400"></i>
+            </div>
+            <h3 class="font-semibold text-lg">Traditional Tools</h3>
+          </div>
+          <div class="space-y-3">
+            <div class="comparison-item">
+              <div class="check-icon bg-red-500/10">
+                <i data-lucide="x" class="w-3 h-3 text-red-400"></i>
+              </div>
+              <span class="text-sm text-gray-400">Manual task creation and assignment</span>
+            </div>
+            <div class="comparison-item">
+              <div class="check-icon bg-red-500/10">
+                <i data-lucide="x" class="w-3 h-3 text-red-400"></i>
+              </div>
+              <span class="text-sm text-gray-400">Generic workflows, not dev-focused</span>
+            </div>
+            <div class="comparison-item">
+              <div class="check-icon bg-red-500/10">
+                <i data-lucide="x" class="w-3 h-3 text-red-400"></i>
+              </div>
+              <span class="text-sm text-gray-400">Hours spent on planning</span>
+            </div>
+            <div class="comparison-item">
+              <div class="check-icon bg-red-500/10">
+                <i data-lucide="x" class="w-3 h-3 text-red-400"></i>
+              </div>
+              <span class="text-sm text-gray-400">Disconnected from actual execution</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-8 border-cyan-500/20 reveal reveal-delay-2">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 flex items-center justify-center">
+              <i data-lucide="check" class="w-6 h-6 text-cyan-400"></i>
+            </div>
+            <h3 class="font-semibold text-lg">DevOrbit</h3>
+          </div>
+          <div class="space-y-3">
+            <div class="comparison-item border-cyan-500/20">
+              <div class="check-icon bg-cyan-500/10">
+                <i data-lucide="check" class="w-3 h-3 text-cyan-400"></i>
+              </div>
+              <span class="text-sm text-gray-300">AI auto-generates tasks from goals</span>
+            </div>
+            <div class="comparison-item border-cyan-500/20">
+              <div class="check-icon bg-cyan-500/10">
+                <i data-lucide="check" class="w-3 h-3 text-cyan-400"></i>
+              </div>
+              <span class="text-sm text-gray-300">Built for developer workflows</span>
+            </div>
+            <div class="comparison-item border-cyan-500/20">
+              <div class="check-icon bg-cyan-500/10">
+                <i data-lucide="check" class="w-3 h-3 text-cyan-400"></i>
+              </div>
+              <span class="text-sm text-gray-300">Planning time reduced by 60%</span>
+            </div>
+            <div class="comparison-item border-cyan-500/20">
+              <div class="check-icon bg-cyan-500/10">
+                <i data-lucide="check" class="w-3 h-3 text-cyan-400"></i>
+              </div>
+              <span class="text-sm text-gray-300">Planning + Execution + Tracking + AI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 reveal">
+        <div class="glass-card p-6 text-center">
+          <div class="text-4xl font-bold gradient-text mb-2">1</div>
+          <div class="font-medium">Platform</div>
+          <div class="text-xs text-gray-500 mt-1">All your tools unified</div>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <div class="text-4xl font-bold gradient-text mb-2">4</div>
+          <div class="font-medium">Core Functions</div>
+          <div class="text-xs text-gray-500 mt-1">Plan, Execute, Track, AI</div>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <div class="text-4xl font-bold gradient-text mb-2">0</div>
+          <div class="font-medium">Context Switches</div>
+          <div class="text-xs text-gray-500 mt-1">Stay in the flow</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Future Scope / Roadmap Section -->
+  <section id="roadmap" class="relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="text-cyan-400 text-sm font-medium tracking-wider uppercase">What's Next</span>
+        <h2 class="section-title mt-4">The Roadmap</h2>
+        <p class="section-subtitle mx-auto">Our vision extends far beyond MVP. Here's where we're headed.</p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-12">
+        <div class="reveal">
+          <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
+            <i data-lucide="map" class="w-5 h-5 text-cyan-400"></i>
+            Coming Soon
+          </h3>
+          
+          <div class="space-y-4">
+            <div class="glass-card p-4 flex items-center gap-4 group">
+              <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-cyan-500/20 transition-colors">
+                <i data-lucide="git-branch" class="w-5 h-5 text-cyan-400"></i>
+              </div>
+              <div>
+                <div class="font-medium">GitHub/GitLab Integration</div>
+                <div class="text-xs text-gray-500">Sync repos, issues, and PRs automatically</div>
+              </div>
+            </div>
+            <div class="glass-card p-4 flex items-center gap-4 group">
+              <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-violet-500/20 transition-colors">
+                <i data-lucide="rocket" class="w-5 h-5 text-violet-400"></i>
+              </div>
+              <div>
+                <div class="font-medium">CI/CD Tracking</div>
+                <div class="text-xs text-gray-500">Monitor deployments and build status</div>
+              </div>
+            </div>
+            <div class="glass-card p-4 flex items-center gap-4 group">
+              <div class="w-10 h-10 rounded-lg bg-pink-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-pink-500/20 transition-colors">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-pink-400"></i>
+              </div>
+              <div>
+                <div class="font-medium">Team Analytics</div>
+                <div class="text-xs text-gray-500">Performance insights and velocity tracking</div>
+              </div>
+            </div>
+            <div class="glass-card p-4 flex items-center gap-4 group">
+              <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-500/20 transition-colors">
+                <i data-lucide="user-check" class="w-5 h-5 text-yellow-400"></i>
+              </div>
+              <div>
+                <div class="font-medium">Mentor Dashboards</div>
+                <div class="text-xs text-gray-500">Enable reviewers and mentors to guide teams</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <div class="glass-card p-8 h-full bg-gradient-to-br from-cyan-500/5 to-violet-500/5">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center">
+                <i data-lucide="target" class="w-6 h-6 text-white"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Long-term Vision</h3>
+            </div>
+            
+            <p class="text-gray-300 mb-6 leading-relaxed">
+              Become the operating system for developer teams worldwide. We envision a future where every dev team—from solo founders to enterprise squads—can build faster with AI-driven workflows that eliminate friction and amplify creativity.
+            </p>
+
+            <div class="space-y-3">
+              <div class="flex items-center gap-3">
+                <div class="pulse-dot"></div>
+                <span class="text-sm text-gray-400">AI-powered project intelligence</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="pulse-dot" style="animation-delay: 0.5s;"></div>
+                <span class="text-sm text-gray-400">Predictive milestone forecasting</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="pulse-dot" style="animation-delay: 1s;"></div>
+                <span class="text-sm text-gray-400">Cross-team collaboration hubs</span>
+              </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-white/5">
+              <p class="text-sm text-gray-500 italic">"The OS for teams that ship"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="max-w-7xl mx-auto">
+      <div class="grid md:grid-cols-4 gap-8 mb-12">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center">
+              <i data-lucide="orbit" class="w-5 h-5 text-white"></i>
+            </div>
+            <span class="font-bold text-xl" style="font-family: 'Space Grotesk', sans-serif;">DevOrbit</span>
+          </div>
+          <p class="text-sm text-gray-500">AI-powered workflow OS for developers who ship.</p>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Product</h4>
+          <div class="space-y-2">
+            <a href="#features" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">Features</a>
+            <a href="#roadmap" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">Roadmap</a>
+            <a href="#solution" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">Solution</a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Resources</h4>
+          <div class="space-y-2">
+            <a href="#" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">Documentation</a>
+            <a href="#" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">API Reference</a>
+            <a href="#" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">Blog</a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold mb-4">Company</h4>
+          <div class="space-y-2">
+            <a href="#" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">About</a>
+            <a href="#" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">Privacy</a>
+            <a href="#" class="block text-sm text-gray-400 hover:text-cyan-400 transition-colors">Terms</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-sm text-gray-500">2024 DevOrbit. Built for developers, by developers.</p>
+        <div class="flex items-center gap-4">
+          <a href="#" class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Twitter">
+            <i data-lucide="twitter" class="w-4 h-4 text-gray-400"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="GitHub">
+            <i data-lucide="github" class="w-4 h-4 text-gray-400"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Discord">
+            <i data-lucide="message-circle" class="w-4 h-4 text-gray-400"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Navigation scroll effect
+    const navbar = document.getElementById('navbar');
+    let lastScroll = 0;
+    
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      
+      if (currentScroll > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      lastScroll = currentScroll;
+    });
+
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    let isMenuOpen = false;
+
+    menuToggle.addEventListener('click', () => {
+      isMenuOpen = !isMenuOpen;
+      mobileMenu.classList.toggle('active', isMenuOpen);
+      mobileMenu.setAttribute('aria-hidden', !isMenuOpen);
+      menuToggle.setAttribute('aria-expanded', isMenuOpen);
+      
+      const icon = menuToggle.querySelector('i');
+      icon.setAttribute('data-lucide', isMenuOpen ? 'x' : 'menu');
+      lucide.createIcons();
+    });
+
+    // Close mobile menu when clicking links
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        isMenuOpen = false;
+        mobileMenu.classList.remove('active');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        
+        const icon = menuToggle.querySelector('i');
+        icon.setAttribute('data-lucide', 'menu');
+        lucide.createIcons();
+      });
+    });
+
+    // Scroll reveal animation
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all reveal elements
+    document.querySelectorAll('.reveal').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+        
+        e.preventDefault();
+        const target = document.querySelector(href);
+        
+        if (target) {
+          const headerOffset = 80;
+          const elementPosition = target.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // Parallax effect on scroll for gradient orbs
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (!prefersReducedMotion) {
+      window.addEventListener('scroll', () => {
+        const scrollY = window.pageYOffset;
+        
+        document.querySelectorAll('.gradient-orb').forEach((orb, index) => {
+          const speed = 0.05 + (index * 0.02);
+          orb.style.transform = `translateY(${scrollY * speed}px)`;
+        });
+      });
+    }
+
+    // Card tilt effect on hover
+    document.querySelectorAll('.glass-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        if (prefersReducedMotion) return;
+        
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 20;
+        const rotateY = (centerX - x) / 20;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+      });
+    });
+  </script>
+</body>
+</html>

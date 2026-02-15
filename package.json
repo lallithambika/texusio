@@ -1,0 +1,12 @@
+{
+  "name": "devorbit",
+  "version": "1.0.0",
+  "description": "AI-Powered Workflow OS for Developers",
+  "scripts": {
+    "dev": "echo 'Serve files locally with: python -m http.server 3000'",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": ["devtools", "workflow", "ai"],
+  "author": "",
+  "license": "MIT"
+}
