@@ -4,7 +4,7 @@
   "description": "AI-Powered Workflow OS for Developers",
   "scripts": {
     "dev": "echo 'Serve files locally with: python -m http.server 3000'",
-    "build": "echo 'Static site - no build needed'"
+    "build": "mkdir -p public && cp index.html vercel.json public/ 2>/dev/null || true"
   },
   "keywords": ["devtools", "workflow", "ai"],
   "author": "",
